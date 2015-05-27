@@ -17,4 +17,8 @@
 			 factory=".properties._AssignmentHistoryItemRelationshipPropertyAdpater"
 			 provides="nti.graphdb.interfaces.IPropertyAdapter" />
 
+	<!-- Subscribers -->
+	<subscriber handler=".assessments._assignment_history_item_added" />
+	<subscriber handler=".assessments._assignment_history_item_removed" />
+	
 </configure>

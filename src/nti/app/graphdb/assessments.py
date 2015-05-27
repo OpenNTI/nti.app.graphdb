@@ -55,7 +55,6 @@ def _add_assignment_taken_relationship(db, username, oid):
 
 	if  assignment is not None and user is not None and \
 		not db.match(user, assignment, TakeAssessment()):
-
 		# get properties from the history item
 		properties = component.queryMultiAdapter((user, item, TakeAssessment()),
 												 IPropertyAdapter) or {}
