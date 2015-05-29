@@ -125,7 +125,7 @@ def _set_asm_feedback(db, oid):
 			direction = 1  # feedback from student to professor
 			item = find_interface(feedback, IUsersCourseAssignmentHistoryItem)
 			course = ICourseInstance(item, None)
-			instructor = _pick_instructor(course)  # pick first found
+			instructor = _pick_instructor(course) if course is not None else None
 		else:
 			direction = 2
 			instructor = creator  # feedback from professor to student
