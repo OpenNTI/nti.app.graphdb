@@ -12,10 +12,13 @@ logger = __import__('logging').getLogger(__name__)
 from zope import component
 from zope import interface
 
+from pyramid.traversal import find_interface
+
 from nti.dataserver.interfaces import IUser
 
 from nti.app.assessment.interfaces import IUsersCourseAssignmentHistoryItem
 from nti.app.assessment.interfaces import IUsersCourseAssignmentMetadataItem
+from nti.app.assessment.interfaces import IUsersCourseAssignmentHistoryItemFeedback
 
 from nti.graphdb.common import get_createdTime
 
@@ -24,6 +27,7 @@ from nti.graphdb.interfaces import IPropertyAdapter
 
 from nti.graphdb.properties import add_oid
 from nti.graphdb.properties import add_intid
+from nti.graphdb.properties import ModeledContentPropertyAdpater
 
 @interface.implementer(IPropertyAdapter)
 @component.adapter(IUser, IUsersCourseAssignmentHistoryItem, ITakeAssessment)
@@ -37,4 +41,14 @@ def _AssignmentHistoryItemRelationshipPropertyAdpater(user, item, rel):
         result['startTime'] = metadata.StartTime
     add_oid(item, result)
     add_intid(item, result)
+    return result
+
+@interface.implementer(IPropertyAdapter)
+@component.adapter(IUsersCourseAssignmentHistoryItemFeedback)
+def _AssignmentFeedbackPropertyAdpater(feedback):
+    result = ModeledContentPropertyAdpater(feedback)
+    result['type'] = 'AssignmentFeedback'
+    item = find_interface(feedback, IUsersCourseAssignmentHistoryItem)
+    if item is not None:
+        result['assignmentId'] = item.__name__
     return result

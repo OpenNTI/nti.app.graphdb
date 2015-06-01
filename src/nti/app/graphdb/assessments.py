@@ -208,8 +208,8 @@ component.moduleProvides(IObjectProcessor)
 
 def init(db, obj):
 	result = True
-# 	if IUser.providedBy(obj):
-# 		init_asssignments(db, obj)
+	if IUsersCourseAssignmentHistoryItem.providedBy(obj):
+		_process_assignment_taken(db, obj)
 # 	elif IUsersCourseAssignmentHistoryItemFeedback.providedBy(obj):
 # 		_process_feedback_added(db, obj)
 # 	else:
