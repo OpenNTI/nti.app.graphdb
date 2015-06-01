@@ -43,20 +43,25 @@ from nti.graphdb.interfaces import IUniqueAttributeAdapter
 from nti.graphdb.relationships import TakeAssessment
 from nti.graphdb.relationships import AssigmentFeedback
 
+def get_assignment(name):
+	return component.queryUtility(IQAssignment, name=name)
+
+def get_assignment_history_item_properties(user, item):
+	result = component.queryMultiAdapter((user, item, TakeAssessment()),
+										IPropertyAdapter)
+	return result or {}
+
 def _add_assignment_taken_relationship(db, username, oid):
 	user = get_entity(username)
 	item = find_object_with_ntiid(oid)  # find user history item
 	if IUsersCourseAssignmentHistoryItem.providedBy(item):
-		assignment = component.queryUtility(IQAssignment, item.__name__)
+		assignment = get_assignment(item.__name__)
 	else:
 		assignment = None
 
 	if  assignment is not None and user is not None and \
 		not db.match(user, assignment, TakeAssessment()):
-		# get properties from the history item
-		properties = component.queryMultiAdapter((user, item, TakeAssessment()),
-												 IPropertyAdapter) or {}
-		# create relationship
+		properties = get_assignment_history_item_properties(user, item)
 		rel = db.create_relationship(user, assignment, TakeAssessment(),
 									 properties=properties)
 		logger.debug("Assignment taken relationship %s created", rel)
