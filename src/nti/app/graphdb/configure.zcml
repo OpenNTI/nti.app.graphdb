@@ -22,12 +22,12 @@
 			 provides="nti.graphdb.interfaces.IPropertyAdapter" />
 			 
 	<!-- Labels -->
-	<adapter for="nti.dataserver.interfaces.IUsersCourseAssignmentHistoryItemFeedback"
+	<adapter for="nti.app.assessment.interfaces.IUsersCourseAssignmentHistoryItemFeedback"
 			 factory=".label._AssignmentFeedbackLabelAdpater"
 			 provides="nti.graphdb.interfaces.ILabelAdapter" />
 			 
 	<!-- Unique -->
-	<adapter for="nti.dataserver.interfaces.IUsersCourseAssignmentHistoryItemFeedback"
+	<adapter for="nti.app.assessment.interfaces.IUsersCourseAssignmentHistoryItemFeedback"
 			 factory="nti.graphdb.unique.OIDUniqueAttributeAdpater"
 			 provides="nti.graphdb.interfaces.IUniqueAttributeAdapter" />
 
