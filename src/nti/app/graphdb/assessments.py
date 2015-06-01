@@ -18,11 +18,7 @@ from zope.lifecycleevent.interfaces import IObjectAddedEvent
 from pyramid.traversal import find_interface
 
 from nti.app.assessment.interfaces import IUsersCourseAssignmentHistoryItem
-# from nti.app.assessment.interfaces import IUsersCourseAssignmentHistoryItemFeedback
-# 
-# from nti.app.products.courseware import interfaces as cw_interfaces
-# 
-# from nti.app.products.gradebook import interfaces as gb_interfaces
+from nti.app.assessment.interfaces import IUsersCourseAssignmentHistoryItemFeedback
 
 from nti.assessment.interfaces import IQAssignment
 
@@ -42,8 +38,10 @@ from nti.graphdb.common import get_creator
 
 from nti.graphdb.interfaces import IObjectProcessor
 from nti.graphdb.interfaces import IPropertyAdapter
+from nti.graphdb.interfaces import IUniqueAttributeAdapter
 
 from nti.graphdb.relationships import TakeAssessment
+from nti.graphdb.relationships import AssigmentFeedback
 
 def _add_assignment_taken_relationship(db, username, oid):
 	user = get_entity(username)
@@ -119,6 +117,10 @@ def _pick_instructor(course):
 def _set_asm_feedback(db, oid):
 	feedback = find_object_with_ntiid(oid)
 	if feedback is not None:
+		unique = IUniqueAttributeAdapter(feedback)
+		if db.get_indexed_relationships(unique.key, unique.value):
+			return
+
 		creator = get_creator(feedback)
 		student = get_creator(feedback.__parent__)
 		if student == creator:
@@ -130,79 +132,54 @@ def _set_asm_feedback(db, oid):
 			direction = 2
 			instructor = creator  # feedback from professor to student
 
-		if not instructor or not student or direction:
+		if not instructor or not student:
 			return
 
-#		 rel_type = relationships.AssigmentFeedback()
-#		 properties = graph_interfaces.IPropertyAdapter(feedback)
-#		 unique = graph_interfaces.IUniqueAttributeAdapter(feedback)
-#
-#		 if direction == 1:
-#			 rel = db.create_relationship(student, instructor, rel_type,
-#										  properties=properties,
-#										  key=unique.key, value=unique.value)
-#		 else:
-#			 rel = db.create_relationship(instructor, student, rel_type,
-#										  properties=properties,
-#										  key=unique.key, value=unique.value)
-#		 logger.debug("assignment feedback relationship %s created", rel)
-#		 return rel
+		rel_type = AssigmentFeedback()
+		properties = IPropertyAdapter(feedback)
+		if direction == 1:
+			rel = db.create_relationship(student, instructor, rel_type,
+										 properties=properties)
+		else:
+			rel = db.create_relationship(instructor, student, rel_type,
+										 properties=properties)
 
-# def _process_feedback_added(db, feedback):
-# 	oid = get_oid(feedback)
-# 	queue = get_job_queue()
-# 	job = create_job(_set_asm_feedback, db=db, oid=oid)
-# 	queue.put(job)
-# 
-# @component.adapter(IUsersCourseAssignmentHistoryItemFeedback, IObjectAddedEvent)
-# def _feedback_added(feedback, event):
-# 	db = get_graph_db()
-# 	if db is not None:
-# 		_process_feedback_added(db, feedback)
-# 
-# def _del_asm_feedback(db, label, key, value):
-# 	rel = db.delete_indexed_relationship(key, value)
-# 	if rel is not None:
-# 		logger.debug("assignment feedback relationship %s deleted", rel)
-# 		return True
-# 	return False
-# 
-# def _process_feedback_removed(db, feedback):
-# 	unique = graph_interfaces.IUniqueAttributeAdapter(feedback)
-# 	queue = get_job_queue()
-# 	job = create_job(_del_asm_feedback, db=db, key=unique.key, value=unique.value)
-# 	queue.put(job)
-# 
-# @component.adapter(IUsersCourseAssignmentHistoryItemFeedback, IIntIdRemovedEvent)
-# def _feedback_removed(feedback, event):
-# 	db = get_graph_db()
-# 	if db is not None:
-# 		_process_feedback_removed(db, feedback)
-# 
-# # utils
-# 
-# def get_course_enrollments(user):
-# 	container = []
-# 	subs = component.subscribers((user,), cw_interfaces.IPrincipalEnrollmentCatalog)
-# 	for catalog in subs:
-# 		queried = catalog.iter_enrollments()
-# 		container.extend(queried)
-# 	container[:] = [cw_interfaces.ICourseInstanceEnrollment(x) for x in container]
-# 	return container
-# 
-# def init_asssignments(db, user):
-# 	enrollments = get_course_enrollments(user)
-# 	for enrollment in enrollments:
-# 		course = enrollment.CourseInstance
-# 		history = component.getMultiAdapter(
-# 									(course, user),
-# 									IUsersCourseAssignmentHistory)
-# 		for _, item in history.items():
-# 			grade = gb_interfaces.IGrade(item, None)
-# 			if grade is not None and grade.value is not None:
-# 				process_grade_modified(db, grade)
-# 			else:
-# 				process_assignment_taken(db, item)
+		# track relationship
+		db.index_relationship(rel, unique.key, unique.value)
+		logger.debug("Assignment feedback relationship %s created", rel)
+		return rel
+
+def _process_feedback_added(db, feedback):
+	oid = get_oid(feedback)
+	queue = get_job_queue()
+	job = create_job(_set_asm_feedback, db=db, oid=oid)
+	queue.put(job)
+
+@component.adapter(IUsersCourseAssignmentHistoryItemFeedback, IObjectAddedEvent)
+def _feedback_added(feedback, event):
+	db = get_graph_db()
+	if db is not None:
+		_process_feedback_added(db, feedback)
+
+def _del_asm_feedback(db, key, value):
+	rels = db.get_indexed_relationships(key, value)
+	if rels:
+		db.delete_relationships(*rels)
+		logger.debug("%s assignment feedback relationship(s) deleted", len(rels))
+		return True
+	return False
+
+def _process_feedback_removed(db, feedback):
+	unique = IUniqueAttributeAdapter(feedback)
+	queue = get_job_queue()
+	job = create_job(_del_asm_feedback, db=db, key=unique.key, value=unique.value)
+	queue.put(job)
+
+@component.adapter(IUsersCourseAssignmentHistoryItemFeedback, IIntIdRemovedEvent)
+def _feedback_removed(feedback, event):
+	db = get_graph_db()
+	if db is not None:
+		_process_feedback_removed(db, feedback)
 
 component.moduleProvides(IObjectProcessor)
 
@@ -210,8 +187,8 @@ def init(db, obj):
 	result = True
 	if IUsersCourseAssignmentHistoryItem.providedBy(obj):
 		_process_assignment_taken(db, obj)
-# 	elif IUsersCourseAssignmentHistoryItemFeedback.providedBy(obj):
-# 		_process_feedback_added(db, obj)
-# 	else:
-# 		result = False
+	elif IUsersCourseAssignmentHistoryItemFeedback.providedBy(obj):
+		_process_feedback_added(db, obj)
+	else:
+		result = False
 	return result

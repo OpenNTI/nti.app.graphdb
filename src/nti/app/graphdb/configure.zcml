@@ -32,6 +32,8 @@
 			 provides="nti.graphdb.interfaces.IUniqueAttributeAdapter" />
 
 	<!-- Subscribers -->
+	<subscriber handler=".assessments._feedback_added" />
+	<subscriber handler=".assessments._feedback_removed" />
 	<subscriber handler=".assessments._assignment_history_item_added" />
 	<subscriber handler=".assessments._assignment_history_item_removed" />
 	
