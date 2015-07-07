@@ -32,7 +32,7 @@ def all_user_ids(usernames=()):
 		user = User.get_user(name)
 		if user is not None:
 			result.add(intids.getId(user))
-	return result
+	return intids.family.IF.LFSet(result)
 
 def all_cataloged_objects(users=()):
 	intids = component.getUtility(IIntIds)
@@ -44,10 +44,11 @@ def all_cataloged_objects(users=()):
 	else:
 		all_intids = None
 		for name in (IX_CREATOR, IX_MIMETYPE, IX_CREATEDTIME):
+			ids = intids.family.IF.LFSet(catalog[name].ids())
 			if all_intids is None:
-				all_intids = catalog[name].ids()
+				all_intids = ids
 			else:
-				all_intids = intids.family.IF.union(all_intids, catalog[name].ids())
+				all_intids = intids.family.IF.union(all_intids, ids)
 
 	for uid in all_intids:
 		obj = intids.queryObject(uid)
