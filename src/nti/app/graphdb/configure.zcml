@@ -43,4 +43,7 @@
 	<subscriber handler=".assessments._assignment_history_item_added" />
 	<subscriber handler=".assessments._assignment_history_item_removed" />
 	
+	<!-- Utilities -->
+	<utility component=".assessments" provides="nti.graphdb.interfaces.IObjectProcessor" name="assessments"/>
+
 </configure>
