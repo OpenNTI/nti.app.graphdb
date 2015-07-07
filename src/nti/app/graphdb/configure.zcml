@@ -10,6 +10,12 @@
 
 	<include package="nti.graphdb" />
 
+	<!-- Traversing -->
+	<adapter name="graphdb"
+			 for="nti.dataserver.interfaces.IDataserverFolder pyramid.interfaces.IRequest"
+			 factory=".views.GraphPathAdapter"
+			 provides="zope.traversing.interfaces.IPathAdapter" />
+			 
 	<!-- Properties -->
 	<adapter for="nti.dataserver.interfaces.IUser
 				  nti.app.assessment.interfaces.IUsersCourseAssignmentHistoryItem 
