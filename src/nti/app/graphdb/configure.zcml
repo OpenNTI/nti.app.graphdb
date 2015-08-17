@@ -19,7 +19,7 @@
 	<!-- Properties -->
 	<adapter for="nti.dataserver.interfaces.IUser
 				  nti.app.assessment.interfaces.IUsersCourseAssignmentHistoryItem 
-				  nti.graphdb.interfaces.ITakeAssessment"
+				  nti.graphdb.interfaces.ITakenAssessment"
 			 factory=".properties._AssignmentHistoryItemRelationshipPropertyAdpater"
 			 provides="nti.graphdb.interfaces.IPropertyAdapter" />
 
