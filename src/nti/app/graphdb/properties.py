@@ -22,15 +22,15 @@ from nti.app.assessment.interfaces import IUsersCourseAssignmentHistoryItemFeedb
 
 from nti.graphdb.common import get_createdTime
 
-from nti.graphdb.interfaces import ITakeAssessment
 from nti.graphdb.interfaces import IPropertyAdapter
+from nti.graphdb.interfaces import ITakenAssessment
 
 from nti.graphdb.properties import add_oid
 from nti.graphdb.properties import add_intid
 from nti.graphdb.properties import ModeledContentPropertyAdpater
 
 @interface.implementer(IPropertyAdapter)
-@component.adapter(IUser, IUsersCourseAssignmentHistoryItem, ITakeAssessment)
+@component.adapter(IUser, IUsersCourseAssignmentHistoryItem, ITakenAssessment)
 def _AssignmentHistoryItemRelationshipPropertyAdpater(user, item, rel):
     result = {'creator' : user.username}
     result['assignmentId'] = item.assignmentId

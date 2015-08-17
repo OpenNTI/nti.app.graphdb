@@ -40,14 +40,14 @@ from nti.graphdb.interfaces import IObjectProcessor
 from nti.graphdb.interfaces import IPropertyAdapter
 from nti.graphdb.interfaces import IUniqueAttributeAdapter
 
-from nti.graphdb.relationships import TakeAssessment
+from nti.graphdb.relationships import TakenAssessment
 from nti.graphdb.relationships import AssigmentFeedback
 
 def get_assignment(name):
 	return component.queryUtility(IQAssignment, name=name)
 
 def get_assignment_history_item_properties(user, item):
-	result = component.queryMultiAdapter((user, item, TakeAssessment()),
+	result = component.queryMultiAdapter((user, item, TakenAssessment()),
 										IPropertyAdapter)
 	return result or {}
 
@@ -60,9 +60,9 @@ def _add_assignment_taken_relationship(db, username, oid):
 		assignment = None
 
 	if  assignment is not None and user is not None and \
-		not db.match(user, assignment, TakeAssessment()):
+		not db.match(user, assignment, TakenAssessment()):
 		properties = get_assignment_history_item_properties(user, item)
-		rel = db.create_relationship(user, assignment, TakeAssessment(),
+		rel = db.create_relationship(user, assignment, TakenAssessment(),
 									 properties=properties)
 		logger.debug("Assignment taken relationship %s created", rel)
 		return rel
@@ -87,7 +87,7 @@ def _remove_assignment_taken_relationship(db, username, assignmentId):
 	user = get_entity(username)
 	assignment = component.queryUtility(IQAssignment, assignmentId)
 	if assignment is not None and user is not None:
-		rels = db.match(user, assignment, TakeAssessment())
+		rels = db.match(user, assignment, TakenAssessment())
 		if rels:
 			db.delete_relationships(*rels)
 		logger.debug("%s assignment taken relationship(s) deleted", len(rels))
