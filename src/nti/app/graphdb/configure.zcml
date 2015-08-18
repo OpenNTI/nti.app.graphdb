@@ -26,7 +26,13 @@
 	<adapter for="nti.app.assessment.interfaces.IUsersCourseAssignmentHistoryItemFeedback"
 			 factory=".properties._AssignmentFeedbackPropertyAdpater"
 			 provides="nti.graphdb.interfaces.IPropertyAdapter" />
-			 
+			
+	<adapter for="nti.dataserver.interfaces.IUser
+				  nti.app.assessment.interfaces.IUsersCourseInquiryItem 
+				  nti.graphdb.interfaces.ITakenInquiry"
+			 factory=".properties._InquiryItemRelationshipPropertyAdpater"
+			 provides="nti.graphdb.interfaces.IPropertyAdapter" />
+ 
 	<!-- Labels -->
 	<adapter for="nti.app.assessment.interfaces.IUsersCourseAssignmentHistoryItemFeedback"
 			 factory=".label._AssignmentFeedbackLabelAdpater"
@@ -40,10 +46,14 @@
 	<!-- Subscribers -->
 	<subscriber handler=".assessments._feedback_added" />
 	<subscriber handler=".assessments._feedback_removed" />
+	<subscriber handler=".assessments._inquiry_item_added" />
+	<subscriber handler=".assessments._inquiry_item_removed" />
 	<subscriber handler=".assessments._assignment_history_item_added" />
 	<subscriber handler=".assessments._assignment_history_item_removed" />
 	
 	<!-- Utilities -->
-	<utility component=".assessments" provides="nti.graphdb.interfaces.IObjectProcessor" name="assessments"/>
+	<utility component=".assessments" 
+			 provides="nti.graphdb.interfaces.IObjectProcessor" 
+			 name="assessments"/>
 
 </configure>

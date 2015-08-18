@@ -17,9 +17,11 @@ from zope.lifecycleevent.interfaces import IObjectAddedEvent
 
 from pyramid.traversal import find_interface
 
+from nti.app.assessment.interfaces import IUsersCourseInquiryItem
 from nti.app.assessment.interfaces import IUsersCourseAssignmentHistoryItem
 from nti.app.assessment.interfaces import IUsersCourseAssignmentHistoryItemFeedback
 
+from nti.assessment.interfaces import IQInquiry
 from nti.assessment.interfaces import IQAssignment
 
 from nti.contenttypes.courses.interfaces import ICourseInstance
@@ -40,7 +42,8 @@ from nti.graphdb.interfaces import IObjectProcessor
 from nti.graphdb.interfaces import IPropertyAdapter
 from nti.graphdb.interfaces import IUniqueAttributeAdapter
 
-from nti.graphdb.relationships import TakenAssessment
+from nti.graphdb.relationships import TakenInquiry
+from nti.graphdb.relationships import TakenAssessment 
 from nti.graphdb.relationships import AssigmentFeedback
 
 def get_assignment(name):
@@ -48,7 +51,7 @@ def get_assignment(name):
 
 def get_assignment_history_item_properties(user, item):
 	result = component.queryMultiAdapter((user, item, TakenAssessment()),
-										IPropertyAdapter)
+										 IPropertyAdapter)
 	return result or {}
 
 def _add_assignment_taken_relationship(db, username, oid):
@@ -186,6 +189,76 @@ def _feedback_removed(feedback, event):
 	if db is not None:
 		_process_feedback_removed(db, feedback)
 
+# inquiry
+
+def get_inquiry(name):
+	return component.queryUtility(IQInquiry, name=name)
+
+def get_inquiry_item_properties(user, item):
+	result = component.queryMultiAdapter((user, item, TakenInquiry()),
+										 IPropertyAdapter)
+	return result or {}
+
+def _add_inquiry_taken_relationship(db, username, oid):
+	user = get_entity(username)
+	item = find_object_with_ntiid(oid)  # find user inquiry item
+	if IUsersCourseInquiryItem.providedBy(item):
+		inquiry = get_inquiry(item.__name__)
+	else:
+		inquiry = None
+
+	if  inquiry is not None and user is not None and \
+		not db.match(user, inquiry, TakenInquiry()):
+		properties = get_inquiry_item_properties(user, item)
+		rel = db.create_relationship(user, inquiry, TakenInquiry(),
+									 properties=properties)
+		logger.debug("Inquiry taken relationship %s created", rel)
+		return rel
+	return None
+
+def _process_inquiry_taken(db, item):
+	oid = get_oid(item)
+	queue = get_job_queue()
+	username = IUser(item).username
+	job = create_job(_add_inquiry_taken_relationship, db=db,
+					 username=username,
+					 oid=oid)
+	queue.put(job)
+
+@component.adapter(IUsersCourseInquiryItem, IObjectAddedEvent)
+def _inquiry_item_added(item, event):
+	db = get_graph_db()
+	if db is not None:
+		_process_inquiry_taken(db, item)
+
+def _remove_inquiry_taken_relationship(db, username, assignmentId):
+	user = get_entity(username)
+	inquiry = component.queryUtility(IQInquiry, assignmentId)
+	if inquiry is not None and user is not None:
+		rels = db.match(user, inquiry, TakenInquiry())
+		if rels:
+			db.delete_relationships(*rels)
+		logger.debug("%s inquiry taken relationship(s) deleted", len(rels))
+		return rels
+	return None
+
+def _process_inquiry_taken_removal(db, item):
+	inquiryId = item.__name__
+	queue = get_job_queue()
+	username = IUser(item).username
+	job = create_job(_remove_inquiry_taken_relationship, db=db,
+					 username=username,
+					 assignmentId=inquiryId)
+	queue.put(job)
+
+@component.adapter(IUsersCourseInquiryItem, IIntIdRemovedEvent)
+def _inquiry_item_removed(item, event):
+	db = get_graph_db()
+	if db is not None:
+		_process_inquiry_taken_removal(db, item)
+
+# processor
+
 component.moduleProvides(IObjectProcessor)
 
 def init(db, obj):
@@ -194,6 +267,8 @@ def init(db, obj):
 		_process_assignment_taken(db, obj)
 	elif IUsersCourseAssignmentHistoryItemFeedback.providedBy(obj):
 		_process_feedback_added(db, obj)
+	elif IUsersCourseInquiryItem.providedBy(obj):
+		_process_inquiry_taken(db, obj)
 	else:
 		result = False
 	return result

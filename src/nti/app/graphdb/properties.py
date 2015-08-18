@@ -16,12 +16,14 @@ from pyramid.traversal import find_interface
 
 from nti.dataserver.interfaces import IUser
 
+from nti.app.assessment.interfaces import IUsersCourseInquiryItem
 from nti.app.assessment.interfaces import IUsersCourseAssignmentHistoryItem
 from nti.app.assessment.interfaces import IUsersCourseAssignmentMetadataItem
 from nti.app.assessment.interfaces import IUsersCourseAssignmentHistoryItemFeedback
 
 from nti.graphdb.common import get_createdTime
 
+from nti.graphdb.interfaces import ITakenInquiry
 from nti.graphdb.interfaces import IPropertyAdapter
 from nti.graphdb.interfaces import ITakenAssessment
 
@@ -51,4 +53,14 @@ def _AssignmentFeedbackPropertyAdpater(feedback):
     item = find_interface(feedback, IUsersCourseAssignmentHistoryItem)
     if item is not None:
         result['assignmentId'] = item.__name__
+    return result
+
+@interface.implementer(IPropertyAdapter)
+@component.adapter(IUser, IUsersCourseInquiryItem, ITakenInquiry)
+def _InquiryItemRelationshipPropertyAdpater(user, item, rel):
+    result = {'creator' : user.username}
+    result['inquiryId'] = item.inquiryId
+    result['createdTime'] = get_createdTime(item)
+    add_oid(item, result)
+    add_intid(item, result)
     return result
