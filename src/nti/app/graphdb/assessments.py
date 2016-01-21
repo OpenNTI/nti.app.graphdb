@@ -100,11 +100,13 @@ def _remove_assignment_taken_relationship(db, username, assignmentId):
 def _process_assignment_taken_removal(db, item):
 	assignmentId = item.__name__
 	queue = get_job_queue()
-	username = IUser(item).username
-	job = create_job(_remove_assignment_taken_relationship, db=db,
-					 username=username,
-					 assignmentId=assignmentId)
-	queue.put(job)
+	user = IUser(item, None)
+	if user is not None:
+		username = user.username
+		job = create_job(_remove_assignment_taken_relationship, db=db,
+						 username=username,
+						 assignmentId=assignmentId)
+		queue.put(job)
 
 @component.adapter(IUsersCourseAssignmentHistoryItem, IIntIdRemovedEvent)
 def _assignment_history_item_removed(item, event):
