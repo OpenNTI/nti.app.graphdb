@@ -28,8 +28,6 @@ from nti.contenttypes.courses.interfaces import ICourseInstance
 
 from nti.dataserver.interfaces import IUser
 
-from nti.ntiids.ntiids import find_object_with_ntiid
-
 from nti.graphdb import create_job
 from nti.graphdb import get_graph_db
 from nti.graphdb import get_job_queue
@@ -45,6 +43,8 @@ from nti.graphdb.interfaces import IUniqueAttributeAdapter
 from nti.graphdb.relationships import TakenInquiry
 from nti.graphdb.relationships import TakenAssessment 
 from nti.graphdb.relationships import AssigmentFeedback
+
+from nti.ntiids.ntiids import find_object_with_ntiid
 
 def get_assignment(name):
 	return component.queryUtility(IQAssignment, name=name)

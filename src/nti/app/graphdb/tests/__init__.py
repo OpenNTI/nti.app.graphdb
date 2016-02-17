@@ -9,10 +9,10 @@ __docformat__ = "restructuredtext en"
 
 from zope import component
 
+from nti.app.testing.application_webtest import ApplicationTestLayer
+
 from nti.dataserver.tests.mock_dataserver import WithMockDS
 from nti.dataserver.tests.mock_dataserver import mock_db_trans
-
-from nti.app.testing.application_webtest import ApplicationTestLayer
 
 from nti.testing.layers import find_test
 from nti.testing.layers import GCLayerMixin
@@ -24,40 +24,40 @@ from nti.dataserver.tests.mock_dataserver import DSInjectorMixin
 import zope.testing.cleanup
 
 class SharedConfiguringTestLayer(ZopeComponentLayer,
-                                 GCLayerMixin,
-                                 ConfiguringLayerMixin,
-                                 DSInjectorMixin):
+								 GCLayerMixin,
+								 ConfiguringLayerMixin,
+								 DSInjectorMixin):
 
-    set_up_packages = ('nti.dataserver', 'nti.graphdb')
+	set_up_packages = ('nti.dataserver', 'nti.graphdb')
 
-    @classmethod
-    def setUp(cls):
-        cls.setUpPackages()
+	@classmethod
+	def setUp(cls):
+		cls.setUpPackages()
 
-    @classmethod
-    def tearDown(cls):
-        cls.tearDownPackages()
-        zope.testing.cleanup.cleanUp()
+	@classmethod
+	def tearDown(cls):
+		cls.tearDownPackages()
+		zope.testing.cleanup.cleanUp()
 
-    @classmethod
-    def testSetUp(cls, test=None):
-        cls.setUpTestDS(test)
+	@classmethod
+	def testSetUp(cls, test=None):
+		cls.setUpTestDS(test)
 
-    @classmethod
-    def testTearDown(cls):
-        pass
+	@classmethod
+	def testTearDown(cls):
+		pass
 
 import unittest
 
 class GraphDBTestCase(unittest.TestCase):
-    layer = SharedConfiguringTestLayer
+	layer = SharedConfiguringTestLayer
 
 class GraphDBApplicationTestLayer(ApplicationTestLayer):
 
-    @classmethod
-    def setUp(cls):
-        pass
+	@classmethod
+	def setUp(cls):
+		pass
 
-    @classmethod
-    def tearDown(cls):
-        pass
+	@classmethod
+	def tearDown(cls):
+		pass

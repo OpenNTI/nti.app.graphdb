@@ -13,15 +13,16 @@ from zope import component
 
 from zope.catalog.interfaces import ICatalog
 
-from zope.intid import IIntIds
+from zope.intid.interfaces import IIntIds
 
-from nti.dataserver.users import User
 from nti.dataserver.interfaces import IDeletedObjectPlaceholder
 
 from nti.dataserver.metadata_index import IX_CREATOR
 from nti.dataserver.metadata_index import IX_MIMETYPE
 from nti.dataserver.metadata_index import IX_CREATEDTIME
 from nti.dataserver.metadata_index import CATALOG_NAME as METADATA_CATALOG_NAME
+
+from nti.dataserver.users import User
 
 from nti.zodb import isBroken
 

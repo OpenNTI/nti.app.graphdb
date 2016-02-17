@@ -16,6 +16,10 @@ from zope import component
 
 from pyramid.view import view_config
 
+from nti.app.graphdb.utils import all_cataloged_objects
+
+from nti.app.graphdb.views import GraphPathAdapter
+
 from nti.common.maps import CaseInsensitiveDict
 
 from nti.dataserver import authorization as nauth
@@ -26,10 +30,6 @@ from nti.graphdb.interfaces import IGraphDB
 from nti.graphdb.interfaces import IObjectProcessor
 
 from nti.externalization.interfaces import LocatedExternalDict
-
-from .utils import all_cataloged_objects
-
-from .views import GraphPathAdapter
 
 def _make_min_max_btree_range(search_term):
 	min_inclusive = search_term  # start here

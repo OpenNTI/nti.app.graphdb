@@ -14,12 +14,12 @@ from zope import interface
 
 from pyramid.traversal import find_interface
 
-from nti.dataserver.interfaces import IUser
-
 from nti.app.assessment.interfaces import IUsersCourseInquiryItem
 from nti.app.assessment.interfaces import IUsersCourseAssignmentHistoryItem
 from nti.app.assessment.interfaces import IUsersCourseAssignmentMetadataItem
 from nti.app.assessment.interfaces import IUsersCourseAssignmentHistoryItemFeedback
+
+from nti.dataserver.interfaces import IUser
 
 from nti.graphdb.common import get_createdTime
 
