@@ -62,8 +62,9 @@ def _add_assignment_taken_relationship(db, username, oid):
 	else:
 		assignment = None
 
-	if  assignment is not None and user is not None and \
-		not db.match(user, assignment, TakenAssessment()):
+	if  	assignment is not None \
+		and user is not None \
+		and not db.match(user, assignment, TakenAssessment()):
 		properties = get_assignment_history_item_properties(user, item)
 		rel = db.create_relationship(user, assignment, TakenAssessment(),
 									 properties=properties)
