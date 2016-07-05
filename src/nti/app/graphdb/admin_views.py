@@ -30,6 +30,9 @@ from nti.graphdb.interfaces import IGraphDB
 from nti.graphdb.interfaces import IObjectProcessor
 
 from nti.externalization.interfaces import LocatedExternalDict
+from nti.externalization.interfaces import StandardExternalFields
+
+TOTAL = StandardExternalFields.TOTAL
 
 def _make_min_max_btree_range(search_term):
 	min_inclusive = search_term  # start here
@@ -82,6 +85,6 @@ def init_graphdb(request):
 	logger.info("Total objects processed %s(%s)", total, elapsed)
 
 	result = LocatedExternalDict()
+	result[TOTAL] = total
 	result['Elapsed'] = elapsed
-	result['Total'] = total
 	return result
