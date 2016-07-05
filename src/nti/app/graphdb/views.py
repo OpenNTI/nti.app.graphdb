@@ -22,7 +22,7 @@ class GraphPathAdapter(Contained):
 
 	__name__ = 'graphdb'
 
-	def __init__(self, context, request):
+	def __init__(self, context, request=None):
 		self.context = context
 		self.request = request
 		self.__parent__ = context

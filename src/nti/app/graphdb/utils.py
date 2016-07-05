@@ -51,7 +51,7 @@ def all_cataloged_objects(users=()):
 			else:
 				all_intids = intids.family.IF.union(all_intids, ids)
 
-	for uid in all_intids:
+	for uid in all_intids or ():
 		obj = intids.queryObject(uid)
 		if obj is None or isBroken(obj, uid) or IDeletedObjectPlaceholder.providedBy(obj):
 			continue
