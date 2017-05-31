@@ -17,10 +17,10 @@ from zope.intid.interfaces import IIntIds
 
 from nti.dataserver.interfaces import IDeletedObjectPlaceholder
 
-from nti.dataserver.metadata_index import IX_CREATOR
-from nti.dataserver.metadata_index import IX_MIMETYPE
-from nti.dataserver.metadata_index import IX_CREATEDTIME
-from nti.dataserver.metadata_index import CATALOG_NAME as METADATA_CATALOG_NAME
+from nti.dataserver.metadata.index import IX_CREATOR
+from nti.dataserver.metadata.index import IX_MIMETYPE
+from nti.dataserver.metadata.index import IX_CREATEDTIME
+from nti.dataserver.metadata.index import CATALOG_NAME as METADATA_CATALOG_NAME
 
 from nti.dataserver.users import User
 
