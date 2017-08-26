@@ -9,6 +9,7 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
+import six
 import time
 
 from requests.structures import CaseInsensitiveDict
@@ -39,7 +40,7 @@ TOTAL = StandardExternalFields.TOTAL
 
 def _make_min_max_btree_range(search_term):
     min_inclusive = search_term  # start here
-    max_exclusive = search_term[0:-1] + unichr(ord(search_term[-1]) + 1)
+    max_exclusive = search_term[0:-1] + six.unichr(ord(search_term[-1]) + 1)
     return min_inclusive, max_exclusive
 
 
