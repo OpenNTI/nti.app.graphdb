@@ -11,8 +11,6 @@ logger = __import__('logging').getLogger(__name__)
 
 from zope import component
 
-from zope.catalog.interfaces import ICatalog
-
 from zope.intid.interfaces import IIntIds
 
 from nti.dataserver.interfaces import IDeletedObjectPlaceholder
@@ -20,9 +18,9 @@ from nti.dataserver.interfaces import IDeletedObjectPlaceholder
 from nti.dataserver.metadata.index import IX_CREATOR
 from nti.dataserver.metadata.index import IX_MIMETYPE
 from nti.dataserver.metadata.index import IX_CREATEDTIME
-from nti.dataserver.metadata.index import CATALOG_NAME as METADATA_CATALOG_NAME
+from nti.dataserver.metadata.index import get_metadata_catalog
 
-from nti.dataserver.users import User
+from nti.dataserver.users.users import User
 
 from nti.zodb import isBroken
 
@@ -39,7 +37,7 @@ def all_user_ids(usernames=()):
 
 def all_cataloged_objects(users=()):
     intids = component.getUtility(IIntIds)
-    catalog = component.getUtility(ICatalog, METADATA_CATALOG_NAME)
+    catalog = get_metadata_catalog()
     usernames = {getattr(user, 'username', user).lower()
                  for user in users or ()}
     if usernames:
