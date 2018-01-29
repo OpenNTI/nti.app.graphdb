@@ -17,7 +17,7 @@ from zope.container.contained import Contained
 
 from z3c.autoinclude.zcml import includePluginsDirective
 
-from nti.async.utils.processor import Processor
+from nti.app.asynchronous.processor import Processor
 
 from nti.graphdb import QUEUE_NAME
 from nti.graphdb.interfaces import IObjectProcessor
