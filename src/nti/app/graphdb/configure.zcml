@@ -8,15 +8,16 @@
 	<include package="zope.component" />
 	<include package="zope.security" />
 
+	<!-- 
 	<include package="nti.graphdb" />
 
-	<!-- Traversing -->
+	Traversing
 	<adapter name="graphdb"
 			 for="nti.dataserver.interfaces.IDataserverFolder pyramid.interfaces.IRequest"
 			 factory=".views.GraphPathAdapter"
 			 provides="zope.traversing.interfaces.IPathAdapter" />
 			 
-	<!-- Properties -->
+	Properties
 	<adapter for="nti.dataserver.interfaces.IUser
 				  nti.app.assessment.interfaces.IUsersCourseAssignmentHistoryItem 
 				  nti.graphdb.interfaces.ITakenAssessment"
@@ -33,17 +34,17 @@
 			 factory=".properties._InquiryItemRelationshipPropertyAdpater"
 			 provides="nti.graphdb.interfaces.IPropertyAdapter" />
  
-	<!-- Labels -->
+	Labels
 	<adapter for="nti.app.assessment.interfaces.IUsersCourseAssignmentHistoryItemFeedback"
 			 factory=".label._AssignmentFeedbackLabelAdpater"
 			 provides="nti.graphdb.interfaces.ILabelAdapter" />
 			 
-	<!-- Unique -->
+	Unique
 	<adapter for="nti.app.assessment.interfaces.IUsersCourseAssignmentHistoryItemFeedback"
 			 factory="nti.graphdb.unique.OIDUniqueAttributeAdpater"
 			 provides="nti.graphdb.interfaces.IUniqueAttributeAdapter" />
 
-	<!-- Subscribers -->
+	Subscribers
 	<subscriber handler=".assessments._feedback_added" />
 	<subscriber handler=".assessments._feedback_removed" />
 	<subscriber handler=".assessments._inquiry_item_added" />
@@ -51,9 +52,9 @@
 	<subscriber handler=".assessments._assignment_history_item_added" />
 	<subscriber handler=".assessments._assignment_history_item_removed" />
 	
-	<!-- Utilities -->
+	Utilities
 	<utility component=".assessments" 
 			 provides="nti.graphdb.interfaces.IObjectProcessor" 
 			 name="assessments"/>
-
+	 -->
 </configure>
